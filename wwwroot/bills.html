@@ -1,21 +1,27 @@
 ﻿<!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <title>Opłaty</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/app.css">
+    <meta charset="UTF-8" />
+    <title>Opłaty cykliczne</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/app.css" />
 </head>
 <body>
 
     <div class="app">
         <h2>Opłaty cykliczne</h2>
 
-        <div id="list" class="transaction-list"></div>
+        <div id="billsList" class="transaction-list">
+            <!-- JS wstawi opłaty -->
+        </div>
     </div>
+
+    <!-- FAB -->
+    <button id="addBillBtn" class="fab fab-green">+</button>
 
     <!-- BOTTOM NAV -->
     <div class="bottom-nav">
+
         <a href="/index.html" class="nav-btn">
             <span class="icon">🏠</span>
             <span class="label">Pulpit</span>
@@ -40,10 +46,8 @@
             <span class="icon">📜</span>
             <span class="label">Historia</span>
         </a>
-    </div>
 
-    <!-- FAB -->
-    <button id="addBillBtn" class="fab fab-green">+</button>
+    </div>
 
     <script src="/js/bills.js"></script>
 </body>

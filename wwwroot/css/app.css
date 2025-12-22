@@ -351,21 +351,34 @@
         opacity: 1;
     }
 
-/* zielony FAB dla opłat */
+/* FAB zielony (opłaty) */
 .fab-green {
     background: #2e7d32;
 }
 
-/* badge */
+/* Badge */
 .badge {
-    padding: 4px 8px;
-    border-radius: 8px;
     font-size: 11px;
-    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 12px;
     color: white;
-    margin-left: 6px;
+    margin-top: 4px;
+    display: inline-block;
 }
 
-    .badge.last {
-        background: #f9a825; /* żółty */
+    .badge.active {
+        background: #2e7d32;
     }
+
+    .badge.warning {
+        background: #f9a825;
+    }
+
+    .badge.paused {
+        background: #9e9e9e;
+    }
+
+/* Opłata wstrzymana */
+.tx-wrapper.paused .transaction {
+    opacity: 0.5;
+}
