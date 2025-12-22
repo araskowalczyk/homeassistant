@@ -356,19 +356,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const frequencySelect = document.getElementById("frequencyType");
     const selectedMonthsInput = document.getElementById("selectedMonths");
+    const monthsChips = document.getElementById("monthsChips");
 
     if (frequencySelect) {
         frequencySelect.addEventListener("change", () => {
+
             if (frequencySelect.value === "SelectedMonths") {
                 selectedMonthsInput.classList.remove("hidden");
-                document.getElementById("monthsChips").classList.remove("hidden");
+                monthsChips?.classList.remove("hidden");
+
+                // 🔥 inicjalizacja chipsów
+                initMonthChips(selectedMonthsInput.value);
+
             } else {
                 selectedMonthsInput.classList.add("hidden");
-                document.getElementById("monthsChips").classList.add("hidden");
                 selectedMonthsInput.value = "";
+
+                monthsChips?.classList.add("hidden");
             }
         });
     }
+
 
     const durationSelect = document.getElementById("durationType");
     const totalOccurrencesInput = document.getElementById("totalOccurrences");
@@ -426,6 +434,16 @@ window.openEditRecurring = async function (id) {
     document.getElementById("frequencyType").value = b.frequencyType;
     document.getElementById("selectedMonths").value = b.selectedMonths ?? "";
     initMonthChips(b.selectedMonths ?? "");
+
+    const monthsChips = document.getElementById("monthsChips");
+
+    if (b.frequencyType === "SelectedMonths") {
+        monthsChips?.classList.remove("hidden");
+        initMonthChips(b.selectedMonths ?? "");
+    } else {
+        monthsChips?.classList.add("hidden");
+    }
+
 
     document.getElementById("durationType").value = b.durationType;
     document.getElementById("totalOccurrences").value = b.totalOccurrences ?? "";
