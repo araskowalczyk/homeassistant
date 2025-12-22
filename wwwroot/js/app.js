@@ -361,9 +361,11 @@ document.addEventListener("DOMContentLoaded", () => {
         frequencySelect.addEventListener("change", () => {
             if (frequencySelect.value === "SelectedMonths") {
                 selectedMonthsInput.classList.remove("hidden");
+                document.getElementById("monthsChips").classList.remove("hidden");
             } else {
                 selectedMonthsInput.classList.add("hidden");
-                selectedMonthsInput.value = ""; // 🔥 ważne
+                document.getElementById("monthsChips").classList.add("hidden");
+                selectedMonthsInput.value = "";
             }
         });
     }
@@ -446,6 +448,8 @@ function openRecurringModal() {
     document.getElementById("type").disabled = true;
 
     showRecurringFields(true);
+
+    initMonthChips("");
     openModal();
 }
 
