@@ -198,19 +198,20 @@ function initMonthChips(selected = "") {
 
 function updateMonthsVisibility() {
     const frequencySelect = document.getElementById("frequencyType");
-    const chips = document.getElementById("monthsChips");
-    const hiddenInput = document.getElementById("selectedMonths");
+    const monthsChipsContainer = document.getElementById("monthsChips");
+    const selectedMonthsInput = document.getElementById("selectedMonths");
 
-    if (!frequencySelect || !chips || !hiddenInput) return;
+    if (!frequencySelect || !monthsChipsContainer || !selectedMonthsInput) return;
 
     if (frequencySelect.value === "SelectedMonths") {
-        chips.classList.remove("hidden");
-        initMonthChips(hiddenInput.value);
+        monthsChipsContainer.classList.remove("hidden");
+        initMonthChips(selectedMonthsInput.value);
     } else {
-        chips.classList.add("hidden");
-        hiddenInput.value = "";
+        monthsChipsContainer.classList.add("hidden");
+        selectedMonthsInput.value = "";
     }
 }
+
 
 
 
@@ -349,7 +350,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = "/income.html";
             }
         };
-    }
+        const frequencySelect = document.getElementById("frequencyType");
+             if (frequencySelect) {frequencySelect.addEventListener("change", updateMonthsVisibility);
+            updateMonthsVisibility(); // 🔥 ustawia UI przy starcie
+        }
+
+    };     
 
     // Tutaj doałem Chipsy w DOM
     const monthsContainer = document.getElementById("monthsChips");
@@ -368,40 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.openEditTransaction(editId);
     }
 
-    // OBSŁUGA FREQUNCY TYPE (OPŁAT CYKLICZNYCH DLA WYBRANYCH MIESIECY ETC.)
-
-    const frequencySelect = document.getElementById("frequencyType");
-    const monthsChipsContainer = document.getElementById("monthsChips");
-    const selectedMonthsInput = document.getElementById("selectedMonths");
-
-    if (frequencySelect && monthsChipsContainer && selectedMonthsInput) {
-
-        function updateFrequencyUI() {
-            if (frequencySelect.value === "SelectedMonths") {
-                // ✅ pokazujemy TYLKO chipsy
-                monthsChipsContainer.classList.remove("hidden");
-
-                // inicjalizujemy chipsy z aktualnej wartości
-                initMonthChips(selectedMonthsInput.value);
-            } else {
-                // ✅ ukrywamy chipsy
-                monthsChipsContainer.classList.add("hidden");
-
-                // ✅ czyścimy wybrane miesiące
-                selectedMonthsInput.value = "";
-            }
-        }
-
-        // 🔹 reaguj na zmianę selecta
-        frequencySelect.addEventListener("change", updateFrequencyUI);
-
-        // 🔹 WAŻNE: ustaw UI przy starcie (ADD / EDIT)
-        updateFrequencyUI();
-    }
-
-
-
-
+    
     const durationSelect = document.getElementById("durationType");
     const totalOccurrencesInput = document.getElementById("totalOccurrences");
 
@@ -452,22 +425,14 @@ window.openEditRecurring = async function (id) {
 
     document.getElementById("amount").value = b.amount;
     document.getElementById("category").value = b.category;
-
     document.getElementById("billDay").value = b.dayOfMonth;
 
     document.getElementById("frequencyType").value = b.frequencyType;
     document.getElementById("selectedMonths").value = b.selectedMonths ?? "";
-    initMonthChips(b.selectedMonths ?? "");
-
-    const monthsChips = document.getElementById("monthsChips");
 
     if (b.frequencyType === "SelectedMonths") {
-        monthsChips?.classList.remove("hidden");
         initMonthChips(b.selectedMonths ?? "");
-    } else {
-        monthsChips?.classList.add("hidden");
     }
-
 
     document.getElementById("durationType").value = b.durationType;
     document.getElementById("totalOccurrences").value = b.totalOccurrences ?? "";
@@ -482,6 +447,7 @@ window.openEditRecurring = async function (id) {
 
 
 
+
 function openRecurringModal() {
     modalMode = "recurring";
 
@@ -490,10 +456,14 @@ function openRecurringModal() {
     document.getElementById("type").value = "Expense";
     document.getElementById("type").disabled = true;
 
+    document.getElementById("frequencyType").value = "Monthly";
+    document.getElementById("selectedMonths").value = "";
+
     showRecurringFields(true);
-    updateMonthsVisibility();
+    updateMonthsVisibility(); // 🔥 JEDYNE sterowanie UI
     openModal();
 }
+
 
 async function saveRecurring() {
     const body = {
