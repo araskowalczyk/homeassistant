@@ -6,17 +6,29 @@ if (!token) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    loadBills();
 
-    document.getElementById("addBillBtn")
-        .addEventListener("click", () => {
+    const addBtn = document.getElementById("addBillBtn");
+    if (addBtn) {
+        addBtn.addEventListener("click", () => {
             window.location.href = "/index.html?add=bill";
         });
+    }
+
+    loadBills();
 });
 
 async function loadBills() {
+    const list = document.getElementById("list");
+
+    if (!list) {
+        console.error("❌ Brak elementu #list w bills.html");
+        return;
+    }
+
+    list.innerHTML = "";
+
     const res = await fetch(`${API}/recurring`, {
-        headers: { "Authorization": `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` }
     });
 
     if (!res.ok) {
@@ -25,8 +37,6 @@ async function loadBills() {
     }
 
     const bills = await res.json();
-    const list = document.getElementById("list");
-    list.innerHTML = "";
 
     bills.forEach(b => {
         const wrapper = document.createElement("div");
@@ -84,8 +94,10 @@ function addSwipe(wrapper, billId) {
 
     function move(e) {
         if (!dragging) return;
+
         currentX = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
         if (Math.abs(currentX) > 100) return;
+
         card.style.transform = `translateX(${currentX}px)`;
     }
 
@@ -94,13 +106,11 @@ function addSwipe(wrapper, billId) {
         card.style.transition = "transform 0.25s ease";
 
         if (currentX < -80) {
-            toggleBill(billId, wrapper);
+            toggleBill(billId);
         }
         else if (currentX > 80) {
             window.location.href = `/index.html?editBill=${billId}`;
         }
-
-
 
         card.style.transform = "translateX(0)";
         cleanup();
@@ -117,9 +127,7 @@ function addSwipe(wrapper, billId) {
 async function toggleBill(id) {
     const res = await fetch(`${API}/recurring/${id}/toggle`, {
         method: "PATCH",
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
     });
 
     if (!res.ok) {
@@ -127,6 +135,5 @@ async function toggleBill(id) {
         return;
     }
 
-    loadBills(); // 🔥 TO JEST KLUCZ
+    loadBills(); // 🔥 odśwież listę
 }
-
