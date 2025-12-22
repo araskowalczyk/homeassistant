@@ -147,6 +147,57 @@ function resetModalState() {
     if (typeEl) typeEl.disabled = false;
 }
 
+
+// GENEROWANIE CHIPSÓW
+
+const months = [
+    "Sty", "Lut", "Mar", "Kwi", "Maj", "Cze",
+    "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru"
+];
+
+function initMonthChips(selected = "") {
+    const container = document.getElementById("monthsChips");
+    const hiddenInput = document.getElementById("selectedMonths");
+
+    if (!container || !hiddenInput) return;
+
+    const selectedSet = new Set(
+        selected
+            .split(",")
+            .map(x => parseInt(x))
+            .filter(x => !isNaN(x))
+    );
+
+    container.innerHTML = "";
+
+    months.forEach((name, i) => {
+        const monthNumber = i + 1;
+        const chip = document.createElement("div");
+        chip.className = "month-chip";
+        chip.innerText = name;
+
+        if (selectedSet.has(monthNumber)) {
+            chip.classList.add("active");
+        }
+
+        chip.addEventListener("click", () => {
+            chip.classList.toggle("active");
+
+            const activeMonths = [...container.children]
+                .map((c, idx) => c.classList.contains("active") ? idx + 1 : null)
+                .filter(x => x !== null);
+
+            hiddenInput.value = activeMonths.join(",");
+        });
+
+        container.appendChild(chip);
+    });
+
+    hiddenInput.value = [...selectedSet].join(",");
+}
+
+
+
 // =======================
 // ADD + EDIT TRANSACTION
 // =======================
@@ -282,7 +333,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = "/income.html";
             }
         };
+    }
 
+    // Tutaj doałem Chipsy w DOM
+    const monthsContainer = document.getElementById("monthsChips");
+    if (monthsContainer) {
+        initMonthChips();
     }
 
     // obsługa ?edit=ID
@@ -364,8 +420,10 @@ window.openEditRecurring = async function (id) {
     document.getElementById("category").value = b.category;
 
     document.getElementById("billDay").value = b.dayOfMonth;
+
     document.getElementById("frequencyType").value = b.frequencyType;
     document.getElementById("selectedMonths").value = b.selectedMonths ?? "";
+    initMonthChips(b.selectedMonths ?? "");
 
     document.getElementById("durationType").value = b.durationType;
     document.getElementById("totalOccurrences").value = b.totalOccurrences ?? "";
@@ -390,35 +448,6 @@ function openRecurringModal() {
     showRecurringFields(true);
     openModal();
 }
-
-async function openEditRecurring(id) {
-    modalMode = "editRecurring";
-    editingRecurringId = id;
-
-    const res = await fetch(`/api/recurring/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
-
-    const b = await res.json();
-
-    document.getElementById("modalTitle").innerText = "Edytuj opłatę";
-
-    document.getElementById("amount").value = b.amount;
-    document.getElementById("category").value = b.category;
-
-    document.getElementById("billDay").value = b.dayOfMonth;
-    document.getElementById("frequencyType").value = b.frequencyType;
-    document.getElementById("selectedMonths").value = b.selectedMonths ?? "";
-    document.getElementById("durationType").value = b.durationType;
-    document.getElementById("totalOccurrences").value = b.totalOccurrences ?? "";
-
-    document.getElementById("type").value = "Expense";
-    document.getElementById("type").disabled = true;
-
-    showRecurringFields(true);
-    openModal();
-}
-
 
 async function saveRecurring() {
     const body = {

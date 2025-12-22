@@ -382,3 +382,26 @@
 .tx-wrapper.paused .transaction {
     opacity: 0.5;
 }
+
+/* Opłat cykliczne chipsy */
+
+.months-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.month-chip {
+    padding: 6px 10px;
+    border-radius: 16px;
+    background: #eee;
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+}
+
+    .month-chip.active {
+        background: #d32f2f;
+        color: white;
+    }
