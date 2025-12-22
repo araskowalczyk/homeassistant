@@ -204,13 +204,24 @@ function updateMonthsVisibility() {
     if (!frequencySelect || !monthsChipsContainer || !selectedMonthsInput) return;
 
     if (frequencySelect.value === "SelectedMonths") {
+        // ✅ pokazujemy chipsy
         monthsChipsContainer.classList.remove("hidden");
+
+        // ✅ inicjalizacja chipsów z aktualnej wartości
         initMonthChips(selectedMonthsInput.value);
+
     } else {
+        // ❌ UKRYWAMY chipsy
         monthsChipsContainer.classList.add("hidden");
+
+        // ❌ czyścimy wartość
         selectedMonthsInput.value = "";
+
+        // ❌ usuwamy aktywne klasy (WAŻNE)
+        monthsChipsContainer.innerHTML = "";
     }
 }
+
 
 
 
@@ -431,13 +442,20 @@ window.openEditRecurring = async function (id) {
     document.getElementById("frequencyType").value = b.frequencyType;
     document.getElementById("selectedMonths").value = b.selectedMonths ?? "";
 
+    document.getElementById("durationType").value = b.durationType;
+    document.getElementById("totalOccurrences").value = b.totalOccurrences ?? "";
+
     document.getElementById("type").value = "Expense";
     document.getElementById("type").disabled = true;
 
     showRecurringFields(true);
-    updateMonthsVisibility(); // 🔥 JEDYNE miejsce decyzyjne
+
+    // 🔥 JEDNO WYWOŁANIE
+    updateMonthsVisibility();
+
     openModal();
 };
+
 
 
 
@@ -451,13 +469,14 @@ function openRecurringModal() {
     document.getElementById("type").value = "Expense";
     document.getElementById("type").disabled = true;
 
-    document.getElementById("frequencyType").value = "Monthly";
-    document.getElementById("selectedMonths").value = "";
-
     showRecurringFields(true);
-    updateMonthsVisibility(); // 🔥 decyduje czy chipsy są widoczne
+
+    // 🔥 USTAW UI NA PODSTAWIE SELECTA
+    updateMonthsVisibility();
+
     openModal();
 }
+
 
 
 
