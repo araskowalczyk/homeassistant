@@ -286,7 +286,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // obsługa ?edit=ID
-    const params = new URLSearchParams(window.location.search);
     const editId = params.get("edit");
     const returnParam = params.get("return");
     if (returnParam) {
