@@ -296,6 +296,40 @@ document.addEventListener("DOMContentLoaded", () => {
     if (editId) {
         window.openEditTransaction(editId);
     }
+
+    // OBSŁUGA FREQUNCY TYPE (OPŁAT CYKLICZNYCH DLA WYBRANYCH MIESIECY ETC.)
+
+    const frequencySelect = document.getElementById("frequencyType");
+    const selectedMonthsInput = document.getElementById("selectedMonths");
+
+    if (frequencySelect) {
+        frequencySelect.addEventListener("change", () => {
+            if (frequencySelect.value === "SelectedMonths") {
+                selectedMonthsInput.classList.remove("hidden");
+            } else {
+                selectedMonthsInput.classList.add("hidden");
+                selectedMonthsInput.value = ""; // 🔥 ważne
+            }
+        });
+    }
+
+    const durationSelect = document.getElementById("durationType");
+    const totalOccurrencesInput = document.getElementById("totalOccurrences");
+
+    if (durationSelect) {
+        durationSelect.addEventListener("change", () => {
+            if (durationSelect.value === "Fixed") {
+                totalOccurrencesInput.classList.remove("hidden");
+            } else {
+                totalOccurrencesInput.classList.add("hidden");
+                totalOccurrencesInput.value = ""; // 🔥 ważne
+            }
+        });
+    }
+
+
+
+
 });
 
 // =======================
@@ -305,6 +339,46 @@ document.addEventListener("DOMContentLoaded", () => {
 function go(page) {
     window.location.href = "/" + page;
 }
+
+// =======================
+// EDIT RECURRING PAYMENT (KROK 2.3)
+// =======================
+
+window.openEditRecurring = async function (id) {
+    modalMode = "editRecurring";
+    editingRecurringId = id;
+
+    const res = await fetch(`/api/recurring/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) {
+        alert("Nie udało się pobrać opłaty");
+        return;
+    }
+
+    const b = await res.json();
+
+    document.getElementById("modalTitle").innerText = "Edytuj opłatę";
+
+    document.getElementById("amount").value = b.amount;
+    document.getElementById("category").value = b.category;
+
+    document.getElementById("billDay").value = b.dayOfMonth;
+    document.getElementById("frequencyType").value = b.frequencyType;
+    document.getElementById("selectedMonths").value = b.selectedMonths ?? "";
+
+    document.getElementById("durationType").value = b.durationType;
+    document.getElementById("totalOccurrences").value = b.totalOccurrences ?? "";
+
+    document.getElementById("type").value = "Expense";
+    document.getElementById("type").disabled = true;
+
+    showRecurringFields(true);
+    openModal();
+};
+
+
 
 function openRecurringModal() {
     modalMode = "recurring";
