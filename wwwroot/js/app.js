@@ -204,19 +204,14 @@ function updateMonthsVisibility() {
     if (!frequencySelect || !monthsChipsContainer || !selectedMonthsInput) return;
 
     if (frequencySelect.value === "SelectedMonths") {
-        // ✅ pokazujemy chipsy
         monthsChipsContainer.classList.remove("hidden");
-
-        // inicjalizacja chipsów z zapisanej wartości
         initMonthChips(selectedMonthsInput.value);
     } else {
-        // ❌ chowamy chipsy
         monthsChipsContainer.classList.add("hidden");
-
-        // czyścimy dane
         selectedMonthsInput.value = "";
     }
 }
+
 
 
 
@@ -367,11 +362,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     };     
 
-    // Tutaj doałem Chipsy w DOM
-    const monthsContainer = document.getElementById("monthsChips");
-    if (monthsContainer) {
-        initMonthChips();
-    }
+   
 
     // obsługa ?edit=ID
     const editId = params.get("edit");
