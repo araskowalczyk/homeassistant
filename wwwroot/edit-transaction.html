@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Edycja transakcji</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+    <div class="app">
+        <h2>Edycja transakcji</h2>
+
+        <form id="editForm">
+            <input type="number" id="amount" placeholder="Kwota" required>
+            <input type="date" id="date" required>
+            <input type="text" id="category" placeholder="Kategoria" required>
+            <input type="text" id="description" placeholder="Opis">
+
+            <button type="submit" class="btn-primary">Zapisz zmiany</button>
+            <button type="button" id="cancel" class="btn-secondary">Anuluj</button>
+        </form>
+    </div>
+
+    <script src="/js/edit-transaction.js"></script>
+</body>
+</html>

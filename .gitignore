@@ -1,0 +1,12 @@
+# .NET
+/bin/
+/obj/
+
+# Publikacja
+/publish/
+
+# Bazy danych
+*.db
+
+# Visual Studio
+.vs/

@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HomeAssistant – Budżet</title>
+    <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+
+    <div class="app">
+
+        <!-- SALDO -->
+        <div class="balance-card">
+            <div class="label">Saldo do wykorzystania</div>
+            <div id="balance" class="balance">0 zł</div>
+            <div id="period" class="period">—</div>
+        </div>
+
+        <!-- MINI WYKRES -->
+        <div class="chart-card">
+            <canvas id="miniChart"></canvas>
+        </div>
+
+        <!-- OSTATNIE TRANSAKCJE -->
+        <div class="transactions-preview">
+            <h3>Ostatnie transakcje</h3>
+            <div id="transactionsList" class="transactions-list">
+                <!-- JS wstawi elementy -->
+            </div>
+        </div>
+
+
+
+
+
+
+        <!-- MENU DOLNE -->
+        <!-- BOTTOM NAV -->
+        <div class="bottom-nav">
+
+            <a href="/index.html" class="nav-btn active">
+                <span class="icon">🏠</span>
+                <span class="label">Pulpit</span>
+            </a>
+
+            <a href="/expenses.html" class="nav-btn">
+                <span class="icon">💸</span>
+                <span class="label">Wydatki</span>
+            </a>
+
+            <a href="/income.html" class="nav-btn">
+                <span class="icon">➕</span>
+                <span class="label">Wpływy</span>
+            </a>
+
+            <a href="/bills.html" class="nav-btn">
+                <span class="icon">📅</span>
+                <span class="label">Opłaty</span>
+            </a>
+
+            <a href="/transactions.html" class="nav-btn">
+                <span class="icon">📜</span>
+                <span class="label">Historia</span>
+            </a>
+
+        </div>
+
+
+
+    </div>
+
+
+    <!-- FAB -->
+    <button id="addBtn" class="fab">+</button>
+
+    <!-- MODAL -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="modalTitle">Nowa transakcja</h3>
+
+            <select id="type">
+                <option value="Expense">Wydatek</option>
+                <option value="Income">Wpływ</option>
+            </select>
+
+            <input id="amount" type="number" placeholder="Kwota" />
+
+            <input id="category" type="text" placeholder="Kategoria" />
+
+            <input id="date" type="date" />
+
+            <input id="description" type="text" placeholder="Opis (opcjonalnie)" />
+
+            <!-- POLA OPŁAT CYKLICZNYCH -->
+            <div id="recurringFields" class="hidden">
+
+                <hr />
+
+                <label>Dzień miesiąca</label>
+                <input id="billDay" type="number" min="1" max="28" />
+
+                <label>Częstotliwość</label>
+                <select id="frequencyType">
+                    <option value="Monthly">Co miesiąc</option>
+                    <option value="SelectedMonths">Wybrane miesiące</option>
+                </select>
+
+                <input id="selectedMonths"
+                       type="text"
+                       placeholder="np. 3,6,7,9"
+                       class="hidden" />
+
+                <label>Czas trwania</label>
+                <select id="durationType">
+                    <option value="Unlimited">Do odwołania</option>
+                    <option value="Fixed">Przez N miesięcy</option>
+                </select>
+
+                <input id="totalOccurrences"
+                       type="number"
+                       placeholder="Ilość miesięcy"
+                       class="hidden" />
+
+            </div>
+
+
+
+            <div class="modal-actions">
+                <button onclick="closeModal()">Anuluj</button>
+                <button class="primary" onclick="submitTransaction()">Zapisz</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/app.js"></script>
+
+
+</body>
+</html>
