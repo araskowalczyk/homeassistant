@@ -196,6 +196,22 @@ function initMonthChips(selected = "") {
     hiddenInput.value = [...selectedSet].join(",");
 }
 
+function updateMonthsVisibility() {
+    const frequencySelect = document.getElementById("frequencyType");
+    const chips = document.getElementById("monthsChips");
+    const hiddenInput = document.getElementById("selectedMonths");
+
+    if (!frequencySelect || !chips || !hiddenInput) return;
+
+    if (frequencySelect.value === "SelectedMonths") {
+        chips.classList.remove("hidden");
+        initMonthChips(hiddenInput.value);
+    } else {
+        chips.classList.add("hidden");
+        hiddenInput.value = "";
+    }
+}
+
 
 
 // =======================
@@ -358,14 +374,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const monthsChipsContainer = document.getElementById("monthsChips");
     const selectedMonthsInput = document.getElementById("selectedMonths");
 
-    if (frequencySelect) {
-        frequencySelect.addEventListener("change", () => {
+    if (frequencySelect && monthsChipsContainer && selectedMonthsInput) {
 
+        function updateFrequencyUI() {
             if (frequencySelect.value === "SelectedMonths") {
                 // ✅ pokazujemy TYLKO chipsy
                 monthsChipsContainer.classList.remove("hidden");
-                initMonthChips(selectedMonthsInput.value);
 
+                // inicjalizujemy chipsy z aktualnej wartości
+                initMonthChips(selectedMonthsInput.value);
             } else {
                 // ✅ ukrywamy chipsy
                 monthsChipsContainer.classList.add("hidden");
@@ -373,8 +390,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 // ✅ czyścimy wybrane miesiące
                 selectedMonthsInput.value = "";
             }
-        });
+        }
+
+        // 🔹 reaguj na zmianę selecta
+        frequencySelect.addEventListener("change", updateFrequencyUI);
+
+        // 🔹 WAŻNE: ustaw UI przy starcie (ADD / EDIT)
+        updateFrequencyUI();
     }
+
 
 
 
@@ -452,6 +476,7 @@ window.openEditRecurring = async function (id) {
     document.getElementById("type").disabled = true;
 
     showRecurringFields(true);
+    updateMonthsVisibility();
     openModal();
 };
 
@@ -466,8 +491,7 @@ function openRecurringModal() {
     document.getElementById("type").disabled = true;
 
     showRecurringFields(true);
-
-    initMonthChips("");
+    updateMonthsVisibility();
     openModal();
 }
 
