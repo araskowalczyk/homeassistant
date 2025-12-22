@@ -204,13 +204,20 @@ function updateMonthsVisibility() {
     if (!frequencySelect || !monthsChipsContainer || !selectedMonthsInput) return;
 
     if (frequencySelect.value === "SelectedMonths") {
+        // ✅ pokazujemy chipsy
         monthsChipsContainer.classList.remove("hidden");
+
+        // inicjalizacja chipsów z zapisanej wartości
         initMonthChips(selectedMonthsInput.value);
     } else {
+        // ❌ chowamy chipsy
         monthsChipsContainer.classList.add("hidden");
+
+        // czyścimy dane
         selectedMonthsInput.value = "";
     }
 }
+
 
 
 
@@ -351,9 +358,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         };
         const frequencySelect = document.getElementById("frequencyType");
-             if (frequencySelect) {frequencySelect.addEventListener("change", updateMonthsVisibility);
-            updateMonthsVisibility(); // 🔥 ustawia UI przy starcie
+
+        if (frequencySelect) {
+            frequencySelect.addEventListener("change", updateMonthsVisibility);
         }
+
+        updateMonthsVisibility(); // 🔥 ustawia stan przy otwarciu modala
 
     };     
 
@@ -430,20 +440,14 @@ window.openEditRecurring = async function (id) {
     document.getElementById("frequencyType").value = b.frequencyType;
     document.getElementById("selectedMonths").value = b.selectedMonths ?? "";
 
-    if (b.frequencyType === "SelectedMonths") {
-        initMonthChips(b.selectedMonths ?? "");
-    }
-
-    document.getElementById("durationType").value = b.durationType;
-    document.getElementById("totalOccurrences").value = b.totalOccurrences ?? "";
-
     document.getElementById("type").value = "Expense";
     document.getElementById("type").disabled = true;
 
     showRecurringFields(true);
-    updateMonthsVisibility();
+    updateMonthsVisibility(); // 🔥 JEDYNE miejsce decyzyjne
     openModal();
 };
+
 
 
 
@@ -460,9 +464,10 @@ function openRecurringModal() {
     document.getElementById("selectedMonths").value = "";
 
     showRecurringFields(true);
-    updateMonthsVisibility(); // 🔥 JEDYNE sterowanie UI
+    updateMonthsVisibility(); // 🔥 decyduje czy chipsy są widoczne
     openModal();
 }
+
 
 
 async function saveRecurring() {
