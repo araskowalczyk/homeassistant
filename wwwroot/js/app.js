@@ -355,27 +355,27 @@ document.addEventListener("DOMContentLoaded", () => {
     // OBSŁUGA FREQUNCY TYPE (OPŁAT CYKLICZNYCH DLA WYBRANYCH MIESIECY ETC.)
 
     const frequencySelect = document.getElementById("frequencyType");
+    const monthsChipsContainer = document.getElementById("monthsChips");
     const selectedMonthsInput = document.getElementById("selectedMonths");
-    const monthsChips = document.getElementById("monthsChips");
 
     if (frequencySelect) {
         frequencySelect.addEventListener("change", () => {
 
             if (frequencySelect.value === "SelectedMonths") {
-                selectedMonthsInput.classList.remove("hidden");
-                monthsChips?.classList.remove("hidden");
-
-                // 🔥 inicjalizacja chipsów
+                // ✅ pokazujemy TYLKO chipsy
+                monthsChipsContainer.classList.remove("hidden");
                 initMonthChips(selectedMonthsInput.value);
 
             } else {
-                selectedMonthsInput.classList.add("hidden");
-                selectedMonthsInput.value = "";
+                // ✅ ukrywamy chipsy
+                monthsChipsContainer.classList.add("hidden");
 
-                monthsChips?.classList.add("hidden");
+                // ✅ czyścimy wybrane miesiące
+                selectedMonthsInput.value = "";
             }
         });
     }
+
 
 
     const durationSelect = document.getElementById("durationType");
