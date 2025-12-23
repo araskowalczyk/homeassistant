@@ -107,10 +107,14 @@ public class BillingController : ControllerBase
 
         var (from, to) = CalculateBillingPeriod(settings.StartDay);
 
+        // =========================
+        // ZWYKŁE TRANSAKCJE
+        // =========================
         var transactions = _db.Transactions
-            .Where(x => x.UserId == userId &&
-                        x.Date >= from &&
-                        x.Date <= to)
+            .Where(x =>
+                x.UserId == userId &&
+                x.Date >= from &&
+                x.Date <= to)
             .AsEnumerable();
 
         var totalIncome = transactions
@@ -121,15 +125,48 @@ public class BillingController : ControllerBase
             .Where(x => x.Type == TransactionType.Expense)
             .Sum(x => x.Amount);
 
+        // =========================
+        // OPŁATY CYKLICZNE
+        // =========================
+        var month = from.Month;
+
+        var recurringExpenses = _db.RecurringPayments
+            .Where(r =>
+                r.UserId == userId &&
+                r.IsActive &&
+                !r.IsPaused &&
+                !r.IsArchived &&
+                r.Type == "Expense")
+            .AsEnumerable()
+            .Where(r =>
+                r.FrequencyType == "Monthly" ||
+                (
+                    r.FrequencyType == "SelectedMonths" &&
+                    !string.IsNullOrEmpty(r.SelectedMonths) &&
+                    r.SelectedMonths
+                        .Split(',')
+                        .Select(int.Parse)
+                        .Contains(month)
+                )
+            )
+            .Sum(r => r.Amount);
+
+        // =========================
+        // FINAL BALANCE
+        // =========================
+        var finalExpense = totalExpense + recurringExpenses;
+
         return Ok(new
         {
             from,
             to,
             totalIncome,
-            totalExpense,
-            balance = totalIncome - totalExpense
+            totalExpense = finalExpense,
+            balance = totalIncome - finalExpense
         });
     }
+
+
 
 
 
