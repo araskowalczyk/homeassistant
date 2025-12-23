@@ -105,17 +105,15 @@ public class BillingController : ControllerBase
             .FirstOrDefault(x => x.UserId == userId)
             ?? new BillingSettings { StartDay = 1 };
 
-        var (from, to) = CalculateBillingPeriod(settings.StartDay);
+        var (from, to) = _service.GetCurrentPeriod(settings.StartDay, DateTime.Now);
 
-        // =========================
-        // ZWYKŁE TRANSAKCJE
-        // =========================
+        // ===== TRANSAKCJE =====
         var transactions = _db.Transactions
             .Where(x =>
                 x.UserId == userId &&
                 x.Date >= from &&
                 x.Date <= to)
-            .AsEnumerable();
+            .ToList();
 
         var totalIncome = transactions
             .Where(x => x.Type == TransactionType.Income)
@@ -125,49 +123,59 @@ public class BillingController : ControllerBase
             .Where(x => x.Type == TransactionType.Expense)
             .Sum(x => x.Amount);
 
-        // =========================
-        // OPŁATY CYKLICZNE
-        // =========================
-        var month = from.Month;
-
-        var recurringExpenses = _db.RecurringPayments
+        // ===== OPŁATY CYKLICZNE =====
+        var recurring = _db.RecurringPayments
             .Where(r =>
                 r.UserId == userId &&
                 r.IsActive &&
                 !r.IsPaused &&
-                !r.IsArchived &&
-                r.Type == "Expense")
-            .AsEnumerable()
-            .Where(r =>
-                r.FrequencyType == "Monthly" ||
-                (
-                    r.FrequencyType == "SelectedMonths" &&
-                    !string.IsNullOrEmpty(r.SelectedMonths) &&
-                    r.SelectedMonths
-                        .Split(',')
-                        .Select(int.Parse)
-                        .Contains(month)
-                )
-            )
-            .Sum(r => r.Amount);
+                !r.IsArchived)
+            .ToList(); // ⬅️ WAŻNE
 
-        // =========================
-        // FINAL BALANCE
-        // =========================
-        var finalExpense = totalExpense + recurringExpenses;
+        decimal recurringExpense = 0;
+
+        foreach (var r in recurring)
+        {
+            // sprawdzamy czy opłata przypada na TEN okres
+            bool shouldCount = false;
+
+            if (r.FrequencyType == "Monthly")
+            {
+                shouldCount = true;
+            }
+            else if (r.FrequencyType == "SelectedMonths" && !string.IsNullOrEmpty(r.SelectedMonths))
+            {
+                var months = r.SelectedMonths
+                    .Split(',')
+                    .Select(m => int.Parse(m))
+                    .ToList();
+
+                shouldCount = months.Contains(from.Month);
+            }
+
+            if (!shouldCount)
+                continue;
+
+            // limit ilości (Fixed)
+            if (r.DurationType == "Fixed" &&
+                r.GeneratedCount >= r.TotalOccurrences)
+                continue;
+
+            if (r.Type == "Expense")
+                recurringExpense += r.Amount;
+
+            if (r.Type == "Income")
+                totalIncome += r.Amount;
+        }
 
         return Ok(new
         {
             from,
             to,
             totalIncome,
-            totalExpense = finalExpense,
-            balance = totalIncome - finalExpense
+            totalExpense = totalExpense + recurringExpense,
+            balance = totalIncome - (totalExpense + recurringExpense)
         });
     }
-
-
-
-
 
 }
