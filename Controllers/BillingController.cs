@@ -107,86 +107,31 @@ public class BillingController : ControllerBase
 
         var (from, to) = _service.GetCurrentPeriod(settings.StartDay, DateTime.Now);
 
-        // =========================
-        // 1️⃣ TRANSAKCJE ZWYKŁE
-        // =========================
         var transactions = _db.Transactions
-            .Where(x =>
-                x.UserId == userId &&
-                x.Date >= from &&
-                x.Date <= to)
+            .Where(t =>
+                t.UserId == userId &&
+                t.Date >= from &&
+                t.Date <= to)
             .ToList();
 
         var totalIncome = transactions
-            .Where(x => x.Type == TransactionType.Income)
-            .Sum(x => x.Amount);
+            .Where(t => t.Type == TransactionType.Income)
+            .Sum(t => t.Amount);
 
         var totalExpense = transactions
-            .Where(x => x.Type == TransactionType.Expense)
-            .Sum(x => x.Amount);
-
-        // =========================
-        // 2️⃣ OPŁATY CYKLICZNE
-        // =========================
-        var recurring = _db.RecurringPayments
-            .Where(r =>
-                r.UserId == userId &&
-                r.IsActive &&
-                !r.IsPaused &&
-                !r.IsArchived)
-            .ToList(); // ⬅️ WAŻNE
-
-        decimal recurringExpense = 0;
-
-        foreach (var r in recurring)
-        {
-            // limit ilości
-            if (r.DurationType == "Fixed" &&
-                r.GeneratedCount >= r.TotalOccurrences)
-                continue;
-
-            bool appliesThisPeriod = false;
-
-            if (r.FrequencyType == "Monthly")
-            {
-                appliesThisPeriod = true;
-            }
-            else if (r.FrequencyType == "SelectedMonths" && !string.IsNullOrEmpty(r.SelectedMonths))
-            {
-                var months = r.SelectedMonths
-                    .Split(',')
-                    .Select(m => int.Parse(m))
-                    .ToList();
-
-                appliesThisPeriod = months.Contains(from.Month);
-            }
-
-            if (!appliesThisPeriod)
-                continue;
-
-            // sprawdź czy termin opłaty mieści się w okresie
-            var billDate = new DateTime(from.Year, from.Month, r.DayOfMonth);
-
-            if (billDate < from || billDate > to)
-                continue;
-
-            recurringExpense += r.Amount;
-        }
-
-        // =========================
-        // 3️⃣ WYNIK
-        // =========================
-        var finalExpense = totalExpense + recurringExpense;
+            .Where(t => t.Type == TransactionType.Expense)
+            .Sum(t => t.Amount);
 
         return Ok(new
         {
             from,
             to,
             totalIncome,
-            totalExpense = finalExpense,
-            balance = totalIncome - finalExpense
+            totalExpense,
+            balance = totalIncome - totalExpense
         });
     }
+
 
 
 }
